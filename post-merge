@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# post-merge hook for Sketch files Git tracking
+
+for sketch_file in *.sketch
+do
+  # Delete existing Sketch file
+  rm "$sketch_file"
+  # Strip .sketch extention
+  directory_name=`echo "$sketch_file" | sed 's/\.sketch//'`
+  cd "$directory_name"
+  # Zip the directory to recreate the Sketch file
+  if zip -r "../$sketch_file" *
+  then
+    echo "'$sketch_file' Sketch file generated."
+  else
+    echo "Couldn't generate '$sketch_file' Sketch file."
+    exit 1
+  fi
+  cd ..
+done
