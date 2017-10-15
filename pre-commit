@@ -15,42 +15,46 @@ do
   directory_name=`echo "$sketch_file" | sed 's/\.sketch//'`
   # Delete existing directory
   rm -rf "$directory_name"
-  # Create directory
-  if mkdir "$directory_name"
+  # If Sketch file wasn't deleted
+  if ! git diff --summary --cached -- $sketch_file | grep "delete" 2>&1 > /dev/null
   then
-    if cd "$directory_name"
+    # Create directory
+    if mkdir "$directory_name"
     then
-      if unzip "../$sketch_file"
+      if cd "$directory_name"
       then
-        echo "'$sketch_file' unzipped."
-        for json_file in $(find . -name "*.json")
-        do
-          if python3 -m json.tool "$json_file" "$json_file".pretty
-          then
-            if mv "$json_file".pretty "$json_file"
+        if unzip "../$sketch_file"
+        then
+          echo "'$sketch_file' unzipped."
+          for json_file in $(find . -name "*.json")
+          do
+            if python3 -m json.tool "$json_file" "$json_file".pretty
             then
-              echo "'$json_file' prettified."
+              if mv "$json_file".pretty "$json_file"
+              then
+                echo "'$json_file' prettified."
+              else
+                echo "Couldn't move prettified '$json_file'."
+                exit 1
+              fi
             else
-              echo "Couldn't move prettified '$json_file'."
+              echo "Couldn't prettify '$json_file'."
               exit 1
             fi
-          else
-            echo "Couldn't prettify '$json_file'."
-            exit 1
-          fi
-        done
+          done
+        else
+          echo "Couldn't unzip '$sketch_file'."
+          exit 1
+        fi
+        cd ..
       else
-        echo "Couldn't unzip '$sketch_file'."
+        echo "Couldn't change directory to '$directory_name'."
         exit 1
       fi
-      cd ..
     else
-      echo "Couldn't change directory to '$directory_name'."
+      echo "Couldn't create directory '$directory_name'."
       exit 1
     fi
-  else
-    echo "Couldn't create directory '$directory_name'."
-    exit 1
   fi
   git add "$directory_name/*"
 done <<< "$git_diff"
