@@ -44,15 +44,18 @@ else
                   echo "'$json_file' prettified."
                 else
                   echo "Couldn't move prettified '$json_file'."
+                  rm -rf "$git_root/$directory"
                   exit 1
                 fi
               else
                 echo "Couldn't prettify '$json_file'."
+                rm -rf "$git_root/$directory"
                 exit 1
               fi
             done
           else
             echo "Couldn't unzip '$sketch_file'."
+            rm -rf "$git_root/$directory"
             exit 1
           fi
           cd "$git_root"
