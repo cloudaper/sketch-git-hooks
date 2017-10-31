@@ -2,6 +2,8 @@
 
 # pre-commit hook for Sketch files Git tracking
 
+# Set UTF-8 encoding
+export LANG=UTF-8
 # Needed to work in SourceTree
 export PATH=/usr/local/bin:$PATH
 
