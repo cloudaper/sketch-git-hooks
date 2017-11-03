@@ -10,4 +10,5 @@ Any feedback or even a pull request welcomed!
 2. Install Python 3 _(optional)_
 3. Download the [pre-commit](https://raw.githubusercontent.com/cloudaper/sketch-git-hooks/master/pre-commit) and [post-merge](https://raw.githubusercontent.com/cloudaper/sketch-git-hooks/master/post-merge) hooks from this repository
 4. Copy them into .git/hooks folder in your repository
-5. And try to commit some Sketch files!
+5. Make the scripts executable: run `chmod +x .git/hooks/pre-commit` and `chmod +x .git/hooks/post-merge` in your repository
+6. And try to commit some Sketch files!
