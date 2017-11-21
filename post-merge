@@ -9,29 +9,37 @@ export PATH=/usr/local/bin:$PATH
 
 # Git repository absolute path
 git_root=`git rev-parse --show-toplevel`
+# Unzipped Sketch files path
+unzipped_directory_name="_unzipped"
+unzipped_root="$git_root/$unzipped_directory_name"
 
-for unzipped_directory in $(find ./_unzipped -type d | grep ".sketch$")
+for unzipped_directory in $(find "$unzipped_root" -type d | grep ".sketch$")
 do
+
   # Sketch file path
-  sketch_file=`echo "$unzipped_directory" | sed 's/\_unzipped\///'`
-  # Sketch file directory
-  directory=`dirname "$sketch_file"`
-  if mkdir -p "$directory"
+  sketch=`echo "$unzipped_directory" | sed "s/$unzipped_directory_name\///"`
+  # Sketch file directory path
+  sketch_directory=`dirname "$sketch"`
+
+  echo "Processing '`basename $sketch`'."
+
+  if mkdir -p "$sketch_directory"
   then
     # Delete existing Sketch file
-    rm "$sketch_file"
+    rm "$sketch"
     # Zip the directory to recreate the Sketch file
     cd "$unzipped_directory"
-    if zip -r "$git_root/$sketch_file" *
+    if zip -rq "$sketch" *
     then
-      echo "'$sketch_file' Sketch file generated."
+      echo "  '`basename $sketch`' Sketch file generated."
     else
-      echo "Couldn't generate '$sketch_file' Sketch file."
+      echo "  Couldn't generate '`basename $sketch`' Sketch file."
       exit 1
     fi
     cd "$git_root"
   else
-    echo "Couldn't create '$directory' directory."
+    echo "  Couldn't create '$sketch_directory' directory."
     exit 1
   fi
+
 done
