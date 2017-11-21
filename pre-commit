@@ -23,7 +23,27 @@ else
     sketch_file_path="$git_root/$sketch_file"
     # Unzipped directory
     unzipped_directory="$git_root/_unzipped/$sketch_file"
+    # Untouched directory
+    untouched_directory="$git_root/_untouched"
+    # Untouched Sketch file
+    untouched_path="$untouched_directory/$sketch_file"
     echo "$sketch_file"
+    # Copy untouched Sketch file to untouched folder
+    if mkdir -p "$untouched_path"
+    then
+      if cp "$sketch_file_path" "$untouched_path"
+      then
+        echo "Untouched '$sketch_file' backed up."
+      else
+        echo "Couldn't copy untouched '$sketch_file'."
+        exit 1
+      fi
+    else
+      echo "Couldn't create untouched directory."
+      exit 1
+    fi
+    # Stage untouched file
+    git add "$untouched_path"
     # Delete existing directory
     rm -rf "$unzipped_directory"
     # If Sketch file wasn't deleted
