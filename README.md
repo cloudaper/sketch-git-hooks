@@ -8,7 +8,7 @@ Any feedback or even a pull request welcomed!
 
 1. Set up a new repository for Sketch files
 2. Install Python 3 _(optional)_
-3. Download the [pre-commit](https://raw.githubusercontent.com/cloudaper/sketch-git-hooks/master/pre-commit) and [post-merge](https://raw.githubusercontent.com/cloudaper/sketch-git-hooks/master/post-merge) hooks from this repository
+3. Download the [pre-commit](https://raw.githubusercontent.com/cloudaper/sketch-git-hooks/master/pre-commit), [post-merge](https://raw.githubusercontent.com/cloudaper/sketch-git-hooks/master/post-merge) and [post-checkout](https://raw.githubusercontent.com/cloudaper/sketch-git-hooks/master/post-checkout) hooks from this repository
 4. Copy them into .git/hooks folder in your repository
-5. Make the scripts executable: run `chmod +x .git/hooks/pre-commit` and `chmod +x .git/hooks/post-merge` in your repository
+5. Make the scripts executable: run `chmod +x .git/hooks/pre-commit .git/hooks/post-merge .git/hooks/post-checkout` in your repository
 6. And try to commit some Sketch files!
