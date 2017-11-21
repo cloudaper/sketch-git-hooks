@@ -36,28 +36,30 @@ else
 
     echo "Processing '`basename $sketch`'."
 
-    # Copy untouched Sketch file to untouched folder
-    if mkdir -p "$untouched_directory"
-    then
-      if cp "$sketch" "$untouched_sketch"
-      then
-        echo "  Untouched '`basename $sketch`' backed up."
-      else
-        echo "  Couldn't copy untouched '`basename $sketch`'."
-        exit 1
-      fi
-    else
-      echo "  Couldn't create '$untouched_root' directory."
-      exit 1
-    fi
-    # Stage untouched file
-    git add "$untouched_sketch"
-
     # Delete existing directory
     rm -rf "$unzipped_directory"
+
     # If Sketch file wasn't deleted
     if ! git diff --summary --cached -- $staged_sketch | grep "delete" 2>&1 > /dev/null
     then
+
+      # Copy untouched Sketch file to untouched folder
+      if mkdir -p "$untouched_directory"
+      then
+        if cp "$sketch" "$untouched_sketch"
+        then
+          echo "  Untouched '`basename $sketch`' backed up."
+        else
+          echo "  Couldn't copy untouched '`basename $sketch`'."
+          exit 1
+        fi
+      else
+        echo "  Couldn't create '$untouched_root' directory."
+        exit 1
+      fi
+      # Stage untouched file
+      git add "$untouched_sketch"
+
       # Create directory
       if mkdir -p "$unzipped_directory"
       then
@@ -100,8 +102,15 @@ else
         echo "  Couldn't create directory '$unzipped_directory'."
         exit 1
       fi
+    else
+      rm "$sketch"
+      rm -rf "$untouched_sketch"
+      echo "  '`basename $sketch`' was removed with all unzipped and untouched data."
     fi
     git add "$unzipped_directory/*"
+
+    # Unstage working Sketch file
+    git rm --cached "$sketch"
 
   done <<< "$git_diff"
 fi
