@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# post-merge hook for Sketch files Git tracking
+# post-checkout hook for Sketch files Git tracking
 
 # Set UTF-8 encoding
 export LANG=UTF-8
