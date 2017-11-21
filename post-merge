@@ -2,20 +2,36 @@
 
 # post-merge hook for Sketch files Git tracking
 
-for sketch_file in *.sketch
+# Set UTF-8 encoding
+export LANG=UTF-8
+# Needed to work in SourceTree
+export PATH=/usr/local/bin:$PATH
+
+# Git repository absolute path
+git_root=`git rev-parse --show-toplevel`
+
+for unzipped_directory in $(find ./_unzipped -type d | grep ".sketch$")
 do
-  # Delete existing Sketch file
-  rm "$sketch_file"
-  # Strip .sketch extention
-  directory_name=`echo "$sketch_file" | sed 's/\.sketch//'`
-  cd "$directory_name"
-  # Zip the directory to recreate the Sketch file
-  if zip -r "../$sketch_file" *
+  # Sketch file path
+  sketch_file=`echo "$unzipped_directory" | sed 's/\_unzipped\///'`
+  # Sketch file directory
+  directory=`dirname "$sketch_file"`
+  if mkdir -p "$directory"
   then
-    echo "'$sketch_file' Sketch file generated."
+    # Delete existing Sketch file
+    rm "$sketch_file"
+    # Zip the directory to recreate the Sketch file
+    cd "$unzipped_directory"
+    if zip -r "$git_root/$sketch_file" *
+    then
+      echo "'$sketch_file' Sketch file generated."
+    else
+      echo "Couldn't generate '$sketch_file' Sketch file."
+      exit 1
+    fi
+    cd "$git_root"
   else
-    echo "Couldn't generate '$sketch_file' Sketch file."
+    echo "Couldn't create '$directory' directory."
     exit 1
   fi
-  cd ..
 done

@@ -10,7 +10,7 @@ export PATH=/usr/local/bin:$PATH
 # Git repository absolute path
 git_root=`git rev-parse --show-toplevel`
 # Create array of all staged files
-git_diff=`git diff --name-only --cached | grep ".*\.sketch"`
+git_diff=`git diff --name-only --cached | grep ".*\.sketch$"`
 
 # Check if there is any staged .sketch file
 if [[ ${git_diff[0]} == '' ]]
@@ -19,20 +19,22 @@ then
 else
   while read sketch_file
   do
+    # Absolute Sketch file path
+    sketch_file_path="$git_root/$sketch_file"
+    # Unzipped directory
+    unzipped_directory="$git_root/_unzipped/$sketch_file"
     echo "$sketch_file"
-    # Strip .sketch extention
-    directory=`echo "$sketch_file" | sed 's/\.sketch//'`
     # Delete existing directory
-    rm -rf "$git_root/$directory"
+    rm -rf "$unzipped_directory"
     # If Sketch file wasn't deleted
     if ! git diff --summary --cached -- $sketch_file | grep "delete" 2>&1 > /dev/null
     then
       # Create directory
-      if mkdir "$git_root/$directory"
+      if mkdir -p "$unzipped_directory"
       then
-        if cd "$git_root/$directory"
+        if cd "$unzipped_directory"
         then
-          if unzip "$git_root/$sketch_file"
+          if unzip "$sketch_file_path"
           then
             echo "'$sketch_file' unzipped."
             for json_file in $(find . -name "*.json")
@@ -44,30 +46,30 @@ else
                   echo "'$json_file' prettified."
                 else
                   echo "Couldn't move prettified '$json_file'."
-                  rm -rf "$git_root/$directory"
+                  rm -rf "$unzipped_directory"
                   exit 1
                 fi
               else
                 echo "Couldn't prettify '$json_file'."
-                rm -rf "$git_root/$directory"
+                rm -rf "$unzipped_directory"
                 exit 1
               fi
             done
           else
             echo "Couldn't unzip '$sketch_file'."
-            rm -rf "$git_root/$directory"
+            rm -rf "$unzipped_directory"
             exit 1
           fi
           cd "$git_root"
         else
-          echo "Couldn't change directory to '$directory'."
+          echo "Couldn't change directory to '$unzipped_directory'."
           exit 1
         fi
       else
-        echo "Couldn't create directory '$directory'."
+        echo "Couldn't create directory '$unzipped_directory'."
         exit 1
       fi
     fi
-    git add "$directory/*"
+    git add "$unzipped_directory/*"
   done <<< "$git_diff"
 fi
